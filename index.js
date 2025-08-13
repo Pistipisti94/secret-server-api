@@ -4,10 +4,19 @@ const { createSecret, getSecret } = require('./secretStore');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./swagger.yaml');
-
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json());
+
+
+//Adatbázis kapcsolat
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+
 
 // Titok létrehozása
 app.post('/api/v1/secrets', (req, res) => {
