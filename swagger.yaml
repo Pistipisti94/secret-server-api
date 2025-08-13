@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: API a titkos üzenetek létrehozására és lekérésére
 servers:
-  - url: http://localhost:3000
+  - url: https://secret-server-api-production.up.railway.app
 
 paths:
   /api/v1/secrets:
