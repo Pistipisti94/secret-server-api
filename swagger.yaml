@@ -2,23 +2,75 @@ openapi: 3.0.0
 info:
   title: Secret Server API
   version: 1.0.0
+  description: API a titkos üzenetek létrehozására és lekérésére
+servers:
+  - url: http://localhost:3000
+
 paths:
   /api/v1/secrets:
     post:
       summary: Titok létrehozása
+      description: Létrehoz egy titkot, ami korlátozott számú alkalommal olvasható, és opcionális TTL-el rendelkezik.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - secret
               properties:
                 secret:
                   type: string
+                  description: A titkos üzenet szövege
                 maxReads:
                   type: integer
+                  description: Hányszor olvasható a titok (alapértelmezett: 1)
                 ttlSeconds:
                   type: integer
+                  description: Idő másodpercben, ameddig a titok elérhető (alapértelmezett: 3600)
       responses:
         '201':
-          description: Titok sikeresen létrehozva
+          description: Titok létrehozva
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: A létrehozott titok tokenje
+        '400':
+          description: Hibás kérés
+
+  /api/v1/secrets/{token}:
+    get:
+      summary: Titok lekérése token alapján
+      description: Lekéri a titkot, csökkenti a hátralevő olvasások számát, és törli ha lejárt vagy elfogyott.
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: A titok tokenje
+      responses:
+        '200':
+          description: Titok sikeresen lekérve
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string
+                    description: A titok szövege
+        '404':
+          description: Titok nem található vagy lejárt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
